@@ -1,4 +1,3 @@
-# MP3_Player
 Project Overview:  
 Functional MP3 Player with custum GUI.  
   
