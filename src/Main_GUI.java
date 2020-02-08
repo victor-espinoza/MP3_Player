@@ -28,6 +28,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -142,7 +143,8 @@ public class Main_GUI extends javax.swing.JFrame {
         JButton forwardJButton;
         JButton backwardJButton;
         
-        // Backward JButton setup
+        
+        // Backward JButton setup 
         backwardJButton = new JButton();
         backwardJButton.setText("<<");
         backwardJButton.setPreferredSize(new Dimension(120,50));
@@ -151,18 +153,20 @@ public class Main_GUI extends javax.swing.JFrame {
         } // event handler called when backwardJButton is clicked
         );
         
+        
         // Play JButton setup
         playJButton = new JButton();
-        playJButton.setText("Play/Resume");
+        playJButton.setText("►");
         playJButton.setPreferredSize(new Dimension(120,50));
         playJButton.addActionListener((ActionEvent e) -> {
             playJButtonActionPerformed();
         } // event handler called when playJButton is clicked
         );
         
+        
         // Pause JButton setup
         pauseJButton = new JButton();
-        pauseJButton.setText("Pause");
+        pauseJButton.setText("❚❚");
         pauseJButton.setPreferredSize(new Dimension(120,50));
         pauseJButton.addActionListener((ActionEvent e) -> {
             pauseJButtonActionPerformed();
@@ -171,7 +175,7 @@ public class Main_GUI extends javax.swing.JFrame {
         
         // Stop JButton setup
         stopJButton = new JButton();
-        stopJButton.setText("Stop");
+        stopJButton.setText("■");
         stopJButton.setPreferredSize(new Dimension(120,50));
         stopJButton.addActionListener((ActionEvent e) -> {
             stopJButtonActionPerformed();
@@ -304,26 +308,31 @@ public class Main_GUI extends javax.swing.JFrame {
         headerPopUpMenu.add(genreColumn);
         headerPopUpMenu.add(commentColumn);        
         
-        libJTableHeader=libJTable.getTableHeader();    
+        libJTableHeader=libJTable.getTableHeader(); 
         libJTableHeader.add(headerPopUpMenu);
         libJTableHeader.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent me) {
                 if(SwingUtilities.isRightMouseButton(me))
-                    headerPopUpMenu.show(me.getComponent(), me.getX(), me.getY());
+                    headerPopUpMenu.show(me.getComponent(), me.getX(), 
+                     me.getY());
             }
         });
             
         // Setup the library JPanel
-        libJTable.setPreferredSize(new Dimension(690,500));
-        controlsJTable.add(new JScrollPane(libJTable));
+        libJTable.setPreferredSize(new Dimension(702,500));
+        //controlsJTable.add(libJTableHeader);
+        JScrollPane libPane = new JScrollPane(libJTable);
+        libPane.setBackground(Color.LIGHT_GRAY);
+        controlsJTable.add(libPane);
         controlsJTable.setBackground(Color.white);
         
         //Setup the JTree JPanel
         playlistLibraryJPanel.setBackground(Color.white);
         JScrollPane scrollPane = new JScrollPane(playlistLibraryJTree);
-        scrollPane.setPreferredSize(new Dimension(115, 430));
+        scrollPane.setPreferredSize(new Dimension(105, 495));
         playlistLibraryJPanel.add(scrollPane);
+        playlistLibraryJPanel.setPreferredSize(new Dimension(115,500));
         
         deletePlaylist = new JMenuItem("Delete Playlist(s)");
         deletePlaylist.addActionListener((ActionEvent e) -> {
@@ -346,8 +355,8 @@ public class Main_GUI extends javax.swing.JFrame {
                 TreePath tp = playlistLibraryJTree.getPathForLocation(me.getX(), 
                  me.getY());
                 if (tp != null){
-                    DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode) 
-                     (tp.getLastPathComponent());
+                    DefaultMutableTreeNode currentNode = 
+                     (DefaultMutableTreeNode) (tp.getLastPathComponent());
                     String stringForm = currentNode.toString();
                     if (stringForm.equals("Library") || stringForm.
                      equals("Playlist") )
@@ -364,7 +373,7 @@ public class Main_GUI extends javax.swing.JFrame {
     });
             // Setup progress bar
             songProgressBar = new JProgressBar();
-            songProgressBar.setPreferredSize(new Dimension(690, 19));
+            songProgressBar.setPreferredSize(new Dimension(690, 20));
             incrementSongTimer = new JTextField("00:00:00");
             incrementSongTimer.setPreferredSize(new Dimension(60, 20));
             incrementSongTimer.setEditable(false);
@@ -383,7 +392,7 @@ public class Main_GUI extends javax.swing.JFrame {
         
         // Adds the control and library JPanel to the container
         container.add(controlsJPanel, BorderLayout.PAGE_START);
-        container.add(playlistLibraryJPanel, BorderLayout.WEST);
+        container.add(playlistLibraryJPanel, BorderLayout.LINE_START);
         container.add(controlsJTable, BorderLayout.CENTER);
         container.add(progressJPanel, BorderLayout.PAGE_END);
         
@@ -398,44 +407,39 @@ public class Main_GUI extends javax.swing.JFrame {
                     boolean songExists=songLibrary.checkIfSongExistsInLibrary(
                      file.getAbsolutePath());
                     if(!loadTableData)
-                        songLibrary.addToDatabase(song);
+                        songLibrary.addSongToLibrary(song);
                     else {
                         if(!songExists)
-                            songLibrary.addToDatabase(song);
+                            songLibrary.addSongToLibrary(song);
                         TreePath path = playlistLibraryJTree.getSelectionPath();
                         if (path !=null){
                             DefaultMutableTreeNode deleteNode = 
                              (DefaultMutableTreeNode) (path.
                              getLastPathComponent());
                                 String stringForm = deleteNode.toString();
-                                int playlistKey = songLibrary.getPlaylistKey(
+                                int playlistKey = songLibrary.getPlaylist(
                                  stringForm);
                                 if (!stringForm.equals("Library") && 
                                  !stringForm.equals("Playlist")){ 
                                     Object songKey = songLibrary.
-                                     getLibrarySongKey(file.getAbsolutePath());
+                                     getLibrarySongId(file.getAbsolutePath());
                                     if (songKey != null)
-                                        songLibrary.addToPlaylistSongs(
+                                        songLibrary.addSongToPlaylist(
                                          playlistKey, songKey);                       
                                 }//end if
-                        }//end 
-                            
-                    }//end else
-                        
-                    
-                    
-                }catch (IOException | UnsupportedTagException | 
+                        }//end if                         
+                    }//end else                    
+                } catch (IOException | UnsupportedTagException | 
                  InvalidDataException ex) {
                     Logger.getLogger(Main_GUI.class.getName()).log(Level.SEVERE, 
                      null, ex);
-                } catch (Exception ex) {
+                } /*catch (Exception ex) {
                     Logger.getLogger(Main_GUI.class.getName()).log(Level.SEVERE, 
                      null, ex);
-                }
-            }
+                }*/
+            }//end for
             Update_table();
-        } // end filesDropped
-        ); // end FileDrop.Listener
+        }); // end FileDrop.Listener
         
         KeyStroke controlI = KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.
          CTRL_MASK);
@@ -447,7 +451,7 @@ public class Main_GUI extends javax.swing.JFrame {
          InputEvent.CTRL_MASK);
         KeyStroke controlL = KeyStroke.getKeyStroke(KeyEvent.VK_L,InputEvent.
          CTRL_MASK);
-        KeyStroke spacebar = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false);
+        KeyStroke spacebar = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,0,false);
        
   
       container.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(controlD, 
@@ -615,12 +619,12 @@ public class Main_GUI extends javax.swing.JFrame {
                     songIsOpen = false;
                     
                     if(!selectedViaShuffle && !isPaused && validPlayOption){
-                        if(songLibrary.checkRecentlyPlayedTableSize()>9)
-                            songLibrary.deleteFromRecentlyPlayed();
+                        if(songLibrary.getRecentlyPlayedSongsNumber()>9)
+                            songLibrary.removeSongFromRecentlyPlayed();
                         String fileLocation= (String)data;
                         Object data1 = (Object)libJTable.getValueAt(row, 2);
                         String songName = (String)data1;
-                        songLibrary.addToRecentlyPlayedTable(fileLocation,
+                        songLibrary.updateRecentlyPlayedSongs(fileLocation,
                          songName);
                     }
                 }//end if
@@ -645,7 +649,8 @@ public class Main_GUI extends javax.swing.JFrame {
                                 int randomRow = libJTable.getRowCount();
                                 Random generator = new Random();
                                 int newRow = generator.nextInt(randomRow);
-                                libJTable.setRowSelectionInterval(newRow,newRow);
+                                libJTable.setRowSelectionInterval(newRow,
+                                 newRow);
                             }//end if
                             playJButtonActionPerformed();                        
                         }//end if
@@ -742,9 +747,9 @@ public class Main_GUI extends javax.swing.JFrame {
                  libJTable.getSelectedRow()-1, true)));
             }//end if
             if (row==0){
-                libJTable.setRowSelectionInterval(libJTable.convertRowIndexToView
-                 (libJTable.getRowCount()-1),libJTable.convertRowIndexToView(
-                 libJTable.getRowCount()-1));
+                libJTable.setRowSelectionInterval(libJTable.
+                 convertRowIndexToView(libJTable.getRowCount()-1),
+                 libJTable.convertRowIndexToView(libJTable.getRowCount()-1));
                 libJTable.scrollRectToVisible(new Rectangle(
                  libJTable.getCellRect(libJTable.convertRowIndexToView
                  (libJTable.getRowCount()-1),libJTable.convertRowIndexToView(
@@ -757,11 +762,6 @@ public class Main_GUI extends javax.swing.JFrame {
         }//end if
         timer.start();
     }
-    
-       /*  Menubar code. Copy and replace the old menubar code.
-        Still need to add the code to populate the playrecent, go2song, and the
-            increment/decrement volume.
-     */
     
     // Menubar method
     private JMenuBar createMenuBar() {
@@ -975,7 +975,7 @@ public class Main_GUI extends javax.swing.JFrame {
                     /* Code to call the method to add file to the library 
                     database getSelectedFile() */
                     Mp3File song = new Mp3File(file.getAbsolutePath());
-                    songLibrary.addToDatabase(song);
+                    songLibrary.addSongToLibrary(song);
                 }//end try
                 catch (IOException | InvalidDataException |
                  UnsupportedTagException ex) {
@@ -1004,7 +1004,7 @@ public class Main_GUI extends javax.swing.JFrame {
                 //remove from playlistSongs first, then remove from library
                 Object data2 = (Object)libJTable.getValueAt(deleteRow, 8);
                 songLibrary.removeDeletedSongsFromPlaylists(data2);
-                songLibrary.deleteFromDatabase(data2);
+                songLibrary.removeSongFromLibrary(data2);
             }//end for
         }
         Update_table();  
@@ -1038,10 +1038,11 @@ public class Main_GUI extends javax.swing.JFrame {
             while(!exitCondition){
                 JFrame addNewPlaylistPopUpMenu= new JFrame();
                 // prompt the user to enter the desired playlist name
-                String name = JOptionPane.showInputDialog(addNewPlaylistPopUpMenu, 
-                 "Please Enter A Playlist Name",null);
-                // get the user's input. note that if they press Cancel, 'name' will be null
-                exitCondition=songLibrary.getPlaylistNames(name);
+                String name = JOptionPane.showInputDialog(
+                 addNewPlaylistPopUpMenu, "Please Enter A Playlist Name",null);
+                // get the user's input. note that if they press Cancel, 
+                //'name' will be null
+                exitCondition=songLibrary.getPlaylistNameAvailability(name);
                 if(!exitCondition){
                     //The playlist name already exists in the playlist table
                     if (!name.equals("Library") && !name.equals("Playlists")){
@@ -1058,7 +1059,7 @@ public class Main_GUI extends javax.swing.JFrame {
                 }
                 else{
                     if (name !=null && !name.equals("")){
-                        songLibrary.addToPlaylist(name);
+                        songLibrary.addNewPlaylist(name);
                         DefaultTreeModel model = (DefaultTreeModel)
                          playlistLibraryJTree.getModel();  
                         DefaultMutableTreeNode newNode = new 
@@ -1093,9 +1094,9 @@ public class Main_GUI extends javax.swing.JFrame {
                 String stringForm = deleteNode.toString();
                 if (!stringForm.equals("Library") && !stringForm.
                  equals("Playlist")){
-                    int x = songLibrary.getPlaylistKey(stringForm);
-                    songLibrary.deleteFromPlaylistSongs(x);
-                    songLibrary.deleteFromPlaylist(stringForm);
+                    int x = songLibrary.getPlaylist(stringForm);
+                    songLibrary.removePlaylistSongsRow(x);
+                    songLibrary.removePlaylist(stringForm);
                     model.removeNodeFromParent(deleteNode);
                     loadTableData=false;
                     Update_table();                     
@@ -1119,12 +1120,12 @@ public class Main_GUI extends javax.swing.JFrame {
             JMenuItem newItem = new JMenuItem(stringForm);
             newItem.addActionListener((ActionEvent e) -> {
                 newItem.getText();
-                int x = songLibrary.getPlaylistKey(newItem.getText());
+                int x = songLibrary.getPlaylist(newItem.getText());
                 int[] rows = libJTable.getSelectedRows();
                 if (rows.length>0){
                 for(int desiredRow: rows){
                     Object data = (Object)libJTable.getValueAt(desiredRow, 8);
-                    songLibrary.addToPlaylistSongs(x, data);
+                    songLibrary.addSongToPlaylist(x, data);
                         
                 }//end for
             }//end if
@@ -1137,18 +1138,18 @@ public class Main_GUI extends javax.swing.JFrame {
     private void CreatePlayRecentMenu(){
         
         playRecentMenu.removeAll();
-        ArrayList<String> songs = songLibrary.getRecentlyPlayedSongNames();
+        ArrayList<String> songs = songLibrary.getRecentlyPlayedSongs();
         for (String s : songs) { 
             JMenuItem newItem = new JMenuItem(s);
             //newItem.setUI(new StayOpenMenuItemUI());
             newItem.addActionListener((ActionEvent e) -> {
                 playRecentItemSelected=true;
                 validPlayOption=true;
-                currentSongPlaying=(String)songLibrary.getPlayRecentSongPath(s);
+                currentSongPlaying=(String)songLibrary.getPlayRecentSong(s);
                 libJTable.getSelectionModel().clearSelection();
-                if(songLibrary.checkRecentlyPlayedTableSize()>9)
-                    songLibrary.deleteFromRecentlyPlayed();
-                songLibrary.addToRecentlyPlayedTable(currentSongPlaying,s);    
+                if(songLibrary.getRecentlyPlayedSongsNumber()>9)
+                    songLibrary.removeSongFromRecentlyPlayed();
+                songLibrary.updateRecentlyPlayedSongs(currentSongPlaying,s);    
                 playJButtonActionPerformed();
             });
             playRecentMenu.add(newItem); 
@@ -1184,8 +1185,8 @@ public class Main_GUI extends javax.swing.JFrame {
         genreColumnIsChecked = genreColumn.isSelected();
         commentColumnIsChecked = commentColumn.isSelected();
         
-        songLibrary.deleteColumnDisplayTableRow();
-        songLibrary.addToColumnDisplayTable(albumColumnIsChecked,
+        songLibrary.removeColumnDisplayTableRow();
+        songLibrary.updateDisplayedColumns(albumColumnIsChecked,
          artistColumnIsChecked, yearColumnIsChecked, genreColumnIsChecked, 
          commentColumnIsChecked);
         
@@ -1203,13 +1204,12 @@ public class Main_GUI extends javax.swing.JFrame {
             String stringForm = deleteNode.toString();
             if (!stringForm.equals("Library") && !stringForm.equals("Playlist"))
             {
-                int x = songLibrary.getPlaylistKey(stringForm);
+                int x = songLibrary.getPlaylist(stringForm);
                 int[] rows = libJTable.getSelectedRows();
                 if (rows.length>0){
                     for(int desiredRow: rows){
-                        Object data = (Object)libJTable.getValueAt(desiredRow,8);
-                        songLibrary.deleteSongsFromPlaylistSongs(x, data);
-
+                        Object data= (Object)libJTable.getValueAt(desiredRow,8);
+                        songLibrary.removeSongFromPlaylist(x, data);
                     }//end for
                     Update_table();
                 }
@@ -1225,7 +1225,7 @@ public class Main_GUI extends javax.swing.JFrame {
     private static void createAndShowUI() {
         try {
             Main_GUI mainGUI = new Main_GUI();
-            JFrame frame = new JFrame("Moo Moo Player");
+            JFrame frame = new JFrame("MP3 Player");
                     //get data from database
             frame.setSize(1000,800);
             frame.setResizable(false);
@@ -1254,9 +1254,9 @@ public class Main_GUI extends javax.swing.JFrame {
     private void Update_table(){
         try {
             if(!loadTableData){
-                if(songLibrary.updateLibraryData()!=null){ 
-                    libJTable.setModel(DbUtils.resultSetToTableModel(
-                     songLibrary.updateLibraryData()));
+                TableModel libraryModel = songLibrary.updateLibraryData();
+                if(libraryModel!=null){ 
+                    libJTable.setModel(libraryModel);
                 }
                 playlistLibraryJTree.setSelectionPath(new TreePath(libraryNode.
                  getPath()));
@@ -1269,20 +1269,23 @@ public class Main_GUI extends javax.swing.JFrame {
                     DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode)
                      (path.getLastPathComponent());
                     String stringForm = treeNode.toString();
-                    int x = songLibrary.getPlaylistKey(stringForm);
+                    int x = songLibrary.getPlaylist(stringForm);
                     ArrayList<String> songs = songLibrary.getPlaylistSongs(x);
                     String query="";
                     for (String s : songs) { 
-                        query += "SELECT * FROM MP3_DATA WHERE PKEY = ";
+                        query += "SELECT * FROM LIBRARY WHERE PKEY = ";
                         query +=  s + " UNION ALL ";
-                    }
+                    }//end for
                     if (query.length() >12)
                         query=query.substring(0,query.length()-11);
-                    query +=" ORDER BY SONG ASC";
-                    if(songLibrary.updatePlaylistData(query) != null){
-                        libJTable.setModel(DbUtils.resultSetToTableModel(
-                        songLibrary.updatePlaylistData(query)));                           
-                    }
+                    //Add the order by clause to queries that have been created
+                    if(!query.equals(""))
+                        query +=" ORDER BY SONG ASC";
+                    TableModel playlistModel = songLibrary.updatePlaylistData(
+                     query);
+                    if(playlistModel != null){
+                        libJTable.setModel(playlistModel);  
+                    }//end if
                 }
             }//end else
             
@@ -1418,10 +1421,10 @@ public class Main_GUI extends javax.swing.JFrame {
         yearColumn = new JCheckBoxMenuItem("Year");
         genreColumn = new JCheckBoxMenuItem("Genre");
         commentColumn = new JCheckBoxMenuItem("Comment");
-        
-        ArrayList<String> columnValues = new ArrayList<>();
+               
         try {
-            columnValues=songLibrary.assignColumnValues(albumColumnIsChecked,
+            ArrayList<String> columnValues =
+             songLibrary.updateDisplayedColumnValues(albumColumnIsChecked,
              artistColumnIsChecked, yearColumnIsChecked, genreColumnIsChecked,
              commentColumnIsChecked);
                 
@@ -1459,7 +1462,7 @@ public class Main_GUI extends javax.swing.JFrame {
  
         try {
             //add existing playlists into the playlistNode
-            songLibrary.initializePlaylistTree(playlistNode);
+            songLibrary.populatePlaylistNames(playlistNode);
         } catch (Exception ex) {
             Logger.getLogger(Main_GUI.class.getName()).log(Level.SEVERE, null, 
              ex);
@@ -1484,14 +1487,16 @@ public class Main_GUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(libJScrollPane, GroupLayout.PREFERRED_SIZE, 1000,
                               GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(0, 0, Short.MAX_VALUE)
+            )
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
             .addComponent(libJScrollPane, GroupLayout.DEFAULT_SIZE, 289,
                           Short.MAX_VALUE)
-            .addContainerGap())
+            .addContainerGap()            
+            )
         );
         Update_table();
         pack();
@@ -1509,12 +1514,13 @@ public class Main_GUI extends javax.swing.JFrame {
                             InvalidDataException, IOException,
                             NotSupportedException  {
         /* Create and display the form */
-        //Library songLibrary = new Library();
-        //songLibrary.createTable();
-        //songLibrary.deleteColumnDisplayTableRow();
-        //songLibrary.dropPlaylistTable();
+        //Library songLibrary1 = new Library();
+        //songLibrary1.createTable();
+        //songLibrary1.deleteLibraryTable();
+        //songLibrary1.deletePlaylistTable();
         java.awt.EventQueue.invokeLater(() -> {
-            try {   createAndShowUI(); 
+            try {   
+                createAndShowUI(); 
             }//end try
             catch(Exception e) {}//end catch
         });
