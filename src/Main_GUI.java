@@ -358,17 +358,17 @@ public class Main_GUI extends javax.swing.JFrame {
          @Override
          public void mouseClicked(MouseEvent e) {
             if (player != null) {
-               int v = songProgressBar.getValue();
 
-               //Retrieves the mouse position relative to the component origin.
-               int mouseX = e.getX();
+               //Get mouse position (where user clicked on progress bar)
+               int mousePos = e.getX();
 
-               //Computes how far along the mouse is relative to the component 
-               //width then multiply it by the progress bar's maximum value.
-               long newStartVal = (long) Math.round(((double) mouseX / (double)
+               //Update the starting value to reflect the appropriate
+               //percentage (so we know where to start playing the song)
+               long newStartVal = (long) Math.round(((double) mousePos /(double)
                 songProgressBar.getWidth()) * songProgressBar.getMaximum());
 
-               int startValInt = (int) Math.round(((double) mouseX / (double)
+               //used to prevent data loss when casting a long to an int
+               int startValInt = (int) Math.round(((double) mousePos / (double)
                 songProgressBar.getWidth()) * songProgressBar.getMaximum());
 
                progressBarVal = newStartVal;
