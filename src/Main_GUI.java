@@ -73,6 +73,7 @@ public class Main_GUI extends javax.swing.JFrame {
    private boolean shuffleSelected = false;
    private boolean selectedViaShuffle = false;
    private boolean progressChanged = false;
+   private boolean externalSongOpened = false;
    private String currentSongPlaying;
    private String songPaused;
    private String openedSong;
@@ -578,7 +579,7 @@ public class Main_GUI extends javax.swing.JFrame {
    private void forwardJButtonActionPerformed() {   
       /* insert method from library to skip to next audio file */
       int row = libJTable.getSelectedRow();
-      if (row >= 0) {
+      if (row >= 0 && !externalSongOpened) {
          if (row < libJTable.convertRowIndexToView(libJTable.getRowCount()-1)){
             libJTable.setRowSelectionInterval(libJTable.getSelectedRow() + 1,
              libJTable.getSelectedRow() + 1);
@@ -597,8 +598,7 @@ public class Main_GUI extends javax.swing.JFrame {
          selectedViaShuffle = false;
          container.repaint();
          timer.start();
-         playJButtonActionPerformed();
-         
+         playJButtonActionPerformed(); 
       }//end if
       //timer.start();
    }
@@ -609,7 +609,7 @@ public class Main_GUI extends javax.swing.JFrame {
       try {
          int row = libJTable.getSelectedRow();
          if (row < 0 && currentSongPlaying == null && !shuffleSelected
-          && !playRecentItemSelected) {
+          && !playRecentItemSelected && !externalSongOpened) {
             libJTable.setRowSelectionInterval(0, 0);
             row = libJTable.getSelectedRow();
             libJTable.scrollRectToVisible(new Rectangle(
@@ -635,7 +635,8 @@ public class Main_GUI extends javax.swing.JFrame {
                   validPlayOption = true;
                }//end if
                currentSongPlaying = (String) data;
-               songIsOpen = false;
+               if (!externalSongOpened)
+                  songIsOpen = false;           
 
                if (!selectedViaShuffle && !isPaused && validPlayOption) {
                   if (songLibrary.getRecentlyPlayedSongsNumber() > 9) 
@@ -749,6 +750,7 @@ public class Main_GUI extends javax.swing.JFrame {
          currentSongPlaying = null;
          selectedViaShuffle = false;
          playRecentItemSelected = false;
+         externalSongOpened = false;
          player = null;
       }//end if
       timer.stop();
@@ -760,7 +762,7 @@ public class Main_GUI extends javax.swing.JFrame {
    // Calls the backward method from the library class
    private void backwardJButtonActionPerformed() {
       int row = libJTable.getSelectedRow();
-      if (row >= 0) {
+      if (row >= 0 && !externalSongOpened) {
          if (row > 0) {
             libJTable.setRowSelectionInterval(libJTable.getSelectedRow() - 1,
              libJTable.getSelectedRow() - 1);
@@ -1048,6 +1050,7 @@ public class Main_GUI extends javax.swing.JFrame {
          int row = libJTable.getSelectedRow();
          if (row >= 0)
             libJTable.removeRowSelectionInterval(row, row);
+         externalSongOpened = true;
          playJButtonActionPerformed();
       }//end if
    }//close openMenuItemActionPerformed()
