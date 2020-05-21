@@ -207,7 +207,6 @@ public class Main_GUI extends javax.swing.JFrame {
                   else 
                      volume = 0;
                   volumeControl.setValue(volume);
-                  // System.out.println(volumeControl.getValue());
                } catch (LineUnavailableException ex) {
                   System.out.println("Something went wrong!");
                }
@@ -345,8 +344,7 @@ public class Main_GUI extends javax.swing.JFrame {
                   loadTableData = true;
                }//end else
                Update_table();
-            } else
-               System.out.println("Nothing to report!");
+            }//end if
          }//end if
       });
 
@@ -559,13 +557,12 @@ public class Main_GUI extends javax.swing.JFrame {
             songProgressBar.setMaximum((int) max);
             songProgressBar.setValue((int) current);
             decrementSongTimer.setText(displayTime(countDownTimer));
-         }
-
+         }//end if
       } catch (UnsupportedAudioFileException | IOException ex) {
          Logger.getLogger(Main_GUI.class.getName()).log(Level.SEVERE, null,
           ex);
-      }
-   }
+      }//end catch
+   }//close updateTimerValues(...)
 
    private String displayTime(double millisecond) {
       int second = (int) (millisecond / 1000) % 60;
@@ -578,7 +575,6 @@ public class Main_GUI extends javax.swing.JFrame {
    }
 
    // Calls the forward method from the library class
-
    private void forwardJButtonActionPerformed() {   
       /* insert method from library to skip to next audio file */
       int row = libJTable.getSelectedRow();
@@ -599,9 +595,12 @@ public class Main_GUI extends javax.swing.JFrame {
          validPlayOption = true;
          progressChanged = false;
          selectedViaShuffle = false;
+         container.repaint();
+         timer.start();
          playJButtonActionPerformed();
+         
       }//end if
-      timer.start();
+      //timer.start();
    }
 
    // plays the audio file
@@ -673,6 +672,8 @@ public class Main_GUI extends javax.swing.JFrame {
                      }//end if
                      playJButtonActionPerformed();
                   }//end if
+                  else
+                     forwardJButtonActionPerformed();
                }
             });
             if (progressChanged)
@@ -764,7 +765,7 @@ public class Main_GUI extends javax.swing.JFrame {
             libJTable.setRowSelectionInterval(libJTable.getSelectedRow() - 1,
              libJTable.getSelectedRow() - 1);
             libJTable.scrollRectToVisible(new Rectangle(
-             libJTable.getCellRect(libJTable.getSelectedRow() - 1,
+             libJTable.getCellRect(libJTable.getSelectedRow() - 1, 
              libJTable.getSelectedRow() - 1, true)));
          }//end if
          if (row == 0) {
@@ -780,9 +781,11 @@ public class Main_GUI extends javax.swing.JFrame {
          validPlayOption = true;
          selectedViaShuffle = false;
          progressChanged = false;
+         container.repaint();
+         timer.start();
          playJButtonActionPerformed();
       }//end if
-      timer.start();
+      //timer.start();
    }
 
    // Menubar method
@@ -907,7 +910,6 @@ public class Main_GUI extends javax.swing.JFrame {
     // Method to 
    // Method to go to the current/selected song on the playlist.
    private void goToCurrentMenuItemActionPerformed() {
-
       boolean foundRow = false;
 
         //First make sure that the playing song is not located within the
@@ -923,12 +925,12 @@ public class Main_GUI extends javax.swing.JFrame {
                libJTable.scrollRectToVisible(new Rectangle(
                 libJTable.getCellRect(row, row, true)));
                foundRow = true;
-               break;
+               break; 
             }//end if
          }//end for
       }//end if  
 
-        //highlight the currently playing song and scroll the screen to insure 
+      //highlight the currently playing song and scroll the screen to insure 
       //that song is visible.
       if (player != null && !foundRow && !songIsOpen) {
          loadTableData = false;
@@ -1254,16 +1256,16 @@ public class Main_GUI extends javax.swing.JFrame {
    private void Update_table() {
       try {
          if (!loadTableData) {
-            TableModel libraryModel = songLibrary.updateLibraryData();
+            TableModel libraryModel = songLibrary.getLibraryData();
             if (libraryModel != null)
                libJTable.setModel(libraryModel);
-            playlistLibraryJTree.setSelectionPath(new TreePath(libraryNode.
-             getPath()));
+            //playlistLibraryJTree.setSelectionPath(new TreePath(libraryNode.
+            // getPath())); 
          } else {
             TreePath path = playlistLibraryJTree.getSelectionPath();
             if (path != null) {
-               DefaultTreeModel model = (DefaultTreeModel) 
-                (playlistLibraryJTree.getModel());
+               //DefaultTreeModel model = (DefaultTreeModel) 
+               // (playlistLibraryJTree.getModel());
                DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) 
                 (path.getLastPathComponent());
                String stringForm = treeNode.toString();
@@ -1279,7 +1281,7 @@ public class Main_GUI extends javax.swing.JFrame {
                //Add the order by clause to queries that have been created
                if (!query.equals(""))
                   query += " ORDER BY SONG ASC";
-               TableModel playlistModel = songLibrary.updatePlaylistData(
+               TableModel playlistModel = songLibrary.getPlaylistData(
                 query);
                if (playlistModel != null)
                   libJTable.setModel(playlistModel);
@@ -1367,7 +1369,8 @@ public class Main_GUI extends javax.swing.JFrame {
       libJScrollPane = new javax.swing.JScrollPane();
       libJTable = new javax.swing.JTable() {
          @Override
-         public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+         public Component prepareRenderer(TableCellRenderer renderer, int row, 
+          int column) {
             Component component = super.prepareRenderer(renderer, row, column);
             int rendererWidth = component.getPreferredSize().width;
             TableColumn tableColumn = getColumnModel().getColumn(column);
@@ -1515,4 +1518,4 @@ public class Main_GUI extends javax.swing.JFrame {
          }//end catch
       });
    }
-}
+} 

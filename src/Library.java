@@ -7,7 +7,7 @@ import com.mpatric.mp3agic.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.util.ArrayList;
+import java.util.ArrayList; 
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -253,23 +253,23 @@ public class Library {
 
    //Retrieves all of the rows (which contain song information) in the
    //Library (LIBRARY table)
-   public TableModel updateLibraryData() {
+   public TableModel getLibraryData() {
       TableModel result = null;
       if (con != null) {
          try (PreparedStatement stmt = con.prepareStatement("SELECT * FROM"
           + " LIBRARY ORDER BY SONG ASC"); ResultSet rs = stmt.executeQuery()){
-            result = convertResultSetToTableModel(rs);
+            result = convertResultSetToTableModel(rs); 
          } catch (SQLException ex) {
             Logger.getLogger(Library.class.getName()).log(Level.SEVERE,
              null, ex);
          }//end catch
       }//end if
       return result;
-   }//close updateLibraryData()
+   }//close getLibraryData()
 
    //Retrieves all of the rows (which contain song information) in the
    //PLAYLIST_SONGS table
-   public TableModel updatePlaylistData(String query) {
+   public TableModel getPlaylistData(String query) {
       TableModel result = null;
       if (con != null) {
          //if the query input is empty, that means that we do not have a
@@ -285,7 +285,7 @@ public class Library {
          }//end catch
       }//end if
       return result;
-   }//close updatePlaylistData(...) 
+   }//close getPlaylistData(...) 
 
    public TableModel convertResultSetToTableModel(ResultSet rs) {
       try {
@@ -601,24 +601,6 @@ public class Library {
          }//end if
       }//close addRecentlyPlayedTableRow(...)
 
-      //Returns the size of the RECENTLY_PLAYED table
-      public int getRecentlyPlayedTableSize(Connection DatabaseConnection) {
-         if (DatabaseConnection != null) {
-            String query = "SELECT COUNT(*) FROM RECENTLY_PLAYED";
-            try (PreparedStatement statement
-             = DatabaseConnection.prepareStatement(query);
-             ResultSet rs = statement.executeQuery();) {
-               //return count value from query (if it has any data)
-               if (rs.next())
-                  return rs.getInt(1);
-            } catch (SQLException err) {
-               Logger.getLogger(Library.class.getName()).log(Level.SEVERE,
-                null, err);
-            }//end catch
-         }//end if
-         return 0;
-      }//close getRecentlyPlayedTableSize(...)
-
       //Deletes a specified row from the Library (LIBRARY table)
       public void deleteLibraryRow(Connection DatabaseConnection, Object key) {
          if (DatabaseConnection != null && key != null) {
@@ -725,6 +707,25 @@ public class Library {
          }//end if                 
       }//close deleteDeletedSongsFromPlaylists(...)
 
+
+      //Returns the size of the RECENTLY_PLAYED table
+      public int getRecentlyPlayedTableSize(Connection DatabaseConnection) {
+         if (DatabaseConnection != null) {
+            String query = "SELECT COUNT(*) FROM RECENTLY_PLAYED";
+            try (PreparedStatement statement
+             = DatabaseConnection.prepareStatement(query);
+             ResultSet rs = statement.executeQuery();) {
+               //return count value from query (if it has any data)
+               if (rs.next())
+                  return rs.getInt(1);
+            } catch (SQLException err) {
+               Logger.getLogger(Library.class.getName()).log(Level.SEVERE,
+                null, err);
+            }//end catch
+         }//end if
+         return 0;
+      }//close getRecentlyPlayedTableSize(...)
+      
       //Returns a list of the songs in the Library (LIBRARY table)
       public Vector<Vector<String>> getLibrarySongs(Connection 
        DatabaseConnection) {
