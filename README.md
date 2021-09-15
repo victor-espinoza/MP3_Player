@@ -13,7 +13,8 @@ The song information area is also user-customizable where they can choose what s
   
 Finally, users can track the progress of the song being played by viewing the song progress bar at the very bottom of the GUI.  
 Here is what our final GUI looks like:  
-![ScreenShot](https://cloud.githubusercontent.com/assets/14812721/24889636/f32c4bbe-1e1f-11e7-9a71-5c6bc3aeae2a.jpg)
+![MP3_Player_Screenshot](https://user-images.githubusercontent.com/14812721/133513706-990836e2-1d4a-41c9-8b56-119351acb083.jpg)
+
   
 
 Dependencies:  
